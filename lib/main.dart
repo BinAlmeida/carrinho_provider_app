@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'models/produto.dart';
 import 'providers/carrinho_provider.dart';
 
@@ -91,23 +90,33 @@ class CatalogoScreen extends StatelessWidget {
           final prod = _produtos[index];
 
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 6,
+            ),
             child: ListTile(
               title: Text(
                 prod.nome,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              subtitle: Text('R\$ ${prod.preco.toStringAsFixed(2)}'),
+              subtitle: Text(
+                'R\$ ${prod.preco.toStringAsFixed(2)}',
+              ),
               trailing: Consumer<CarrinhoProvider>(
                 builder: (context, carrinho, child) {
-                  final estaNoCarrinho = carrinho.itens.contains(prod);
+                  final estaNoCarrinho =
+                      carrinho.itens.contains(prod);
 
                   return IconButton(
                     icon: Icon(
                       estaNoCarrinho
                           ? Icons.check_circle
                           : Icons.add_shopping_cart,
-                      color: estaNoCarrinho ? Colors.green : Colors.teal,
+                      color: estaNoCarrinho
+                          ? Colors.green
+                          : Colors.teal,
                     ),
                     onPressed: () {
                       carrinho.adicionar(prod);
@@ -153,11 +162,14 @@ class CarrinhoScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = carrinho.itens[index];
 
-                    final quantidade = carrinho.quantidadeDoProduto(item);
+                    final quantidade =
+                        carrinho.quantidadeDoProduto(item);
 
                     return ListTile(
                       title: Text(item.nome),
-                      subtitle: Text('R\$ ${item.preco.toStringAsFixed(2)}'),
+                      subtitle: Text(
+                        'R\$ ${item.preco.toStringAsFixed(2)}',
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -220,7 +232,9 @@ class CarrinhoScreen extends StatelessWidget {
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Cupom de 10% aplicado!'),
+                            content: Text(
+                              'Cupom de 10% aplicado!',
+                            ),
                           ),
                         );
                       },
@@ -249,7 +263,8 @@ class CarrinhoScreen extends StatelessWidget {
                       ),
                     const SizedBox(height: 5),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Total: R\$ ${carrinho.valorFinal.toStringAsFixed(2)}',
@@ -259,14 +274,59 @@ class CarrinhoScreen extends StatelessWidget {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            carrinho.limpar();
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Compra finalizada com sucesso!'),
-                              ),
+                          // EXERCÍCIO 03
+                          onPressed: () async {
+                            final confirmar =
+                                await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Confirmar compra',
+                                  ),
+                                  content: const Text(
+                                    'Deseja realmente finalizar a compra?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(
+                                          context,
+                                          false,
+                                        );
+                                      },
+                                      child: const Text(
+                                        'Cancelar',
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(
+                                          context,
+                                          true,
+                                        );
+                                      },
+                                      child: const Text(
+                                        'Confirmar',
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
+
+                            if (confirmar == true) {
+                              carrinho.limpar();
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Compra finalizada com sucesso!',
+                                  ),
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
