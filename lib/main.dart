@@ -22,15 +22,15 @@ class CarrinhoApp extends StatelessWidget {
       title: 'Carrinho com Provider',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
-      home: CatalogoScreen(),
+      home: const CatalogoScreen(),
     );
   }
 }
 
 class CatalogoScreen extends StatelessWidget {
-  CatalogoScreen({super.key});
+  const CatalogoScreen({super.key});
 
-  final List<Produto> _produtos = [
+  static final List<Produto> _produtos = [
     Produto(id: '1', nome: 'Teclado Mecânico', preco: 250.00),
     Produto(id: '2', nome: 'Mouse Gamer', preco: 120.00),
     Produto(id: '3', nome: 'Monitor 24"', preco: 890.00),
@@ -192,26 +192,35 @@ class CarrinhoScreen extends StatelessWidget {
                   },
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(20),
-                color: Colors.teal.shade50,
+
+              // CUPOM
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 5,
+                ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Total: R\$ ${carrinho.valorTotal.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Cupom',
+                          hintText: 'DESCONTO10',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSubmitted: (valor) {
+                          carrinho.aplicarCupom(valor);
+                        },
                       ),
                     ),
+                    const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
-                        carrinho.limpar();
+                        carrinho.aplicarCupom('DESCONTO10');
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Compra finalizada com sucesso!'),
+                            content: Text('Cupom de 10% aplicado!'),
                           ),
                         );
                       },
@@ -219,7 +228,53 @@ class CarrinhoScreen extends StatelessWidget {
                         backgroundColor: Colors.teal,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Finalizar'),
+                      child: const Text('Aplicar'),
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.all(20),
+                color: Colors.teal.shade50,
+                child: Column(
+                  children: [
+                    if (carrinho.cupomAplicado)
+                      Text(
+                        'Desconto: R\$ ${carrinho.desconto.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.green,
+                        ),
+                      ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total: R\$ ${carrinho.valorFinal.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            carrinho.limpar();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Compra finalizada com sucesso!'),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Finalizar'),
+                        ),
+                      ],
                     ),
                   ],
                 ),

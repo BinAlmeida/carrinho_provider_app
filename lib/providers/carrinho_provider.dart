@@ -4,8 +4,9 @@ import '../models/produto.dart';
 class CarrinhoProvider extends ChangeNotifier {
   final List<Produto> _itens = [];
 
-  // Guarda a quantidade de cada produto
   final Map<String, int> _quantidades = {};
+
+  bool _cupomAplicado = false;
 
   List<Produto> get itens => List.unmodifiable(_itens);
 
@@ -20,8 +21,23 @@ class CarrinhoProvider extends ChangeNotifier {
     return _itens.fold(
       0.0,
       (total, item) =>
-          total + (item.preco * (_quantidades[item.id] ?? 0)),
+          total +
+          (item.preco * (_quantidades[item.id] ?? 0)),
     );
+  }
+
+  bool get cupomAplicado => _cupomAplicado;
+
+  double get desconto {
+    if (_cupomAplicado) {
+      return valorTotal * 0.10;
+    }
+
+    return 0.0;
+  }
+
+  double get valorFinal {
+    return valorTotal - desconto;
   }
 
   int quantidadeDoProduto(Produto produto) {
@@ -66,9 +82,23 @@ class CarrinhoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // EXERCÍCIO 02
+  void aplicarCupom(String cupom) {
+    if (cupom.trim().toUpperCase() == 'DESCONTO10') {
+      _cupomAplicado = true;
+      notifyListeners();
+    }
+  }
+
+  void limparCupom() {
+    _cupomAplicado = false;
+    notifyListeners();
+  }
+
   void limpar() {
     _itens.clear();
     _quantidades.clear();
+    _cupomAplicado = false;
 
     notifyListeners();
   }
