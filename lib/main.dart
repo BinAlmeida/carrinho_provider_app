@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'models/produto.dart';
 import 'providers/carrinho_provider.dart';
 
@@ -20,10 +21,7 @@ class CarrinhoApp extends StatelessWidget {
     return MaterialApp(
       title: 'Carrinho com Provider',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
       home: CatalogoScreen(),
     );
   }
@@ -56,7 +54,9 @@ class CatalogoScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const CarrinhoScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const CarrinhoScreen(),
+                    ),
                   );
                 },
               ),
@@ -72,37 +72,45 @@ class CatalogoScreen extends StatelessWidget {
                             backgroundColor: Colors.red,
                             child: Text(
                               '${carrinho.quantidade}',
-                              style: const TextStyle(fontSize: 12, color: Colors.white),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
                             ),
                           );
                   },
                 ),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
       body: ListView.builder(
         itemCount: _produtos.length,
         itemBuilder: (context, index) {
           final prod = _produtos[index];
+
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: ListTile(
-              title: Text(prod.nome, style: const TextStyle(fontWeight: FontWeight.bold)),
+              title: Text(
+                prod.nome,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               subtitle: Text('R\$ ${prod.preco.toStringAsFixed(2)}'),
               trailing: Consumer<CarrinhoProvider>(
                 builder: (context, carrinho, child) {
                   final estaNoCarrinho = carrinho.itens.contains(prod);
+
                   return IconButton(
                     icon: Icon(
-                      estaNoCarrinho ? Icons.check_circle : Icons.add_shopping_cart,
+                      estaNoCarrinho
+                          ? Icons.check_circle
+                          : Icons.add_shopping_cart,
                       color: estaNoCarrinho ? Colors.green : Colors.teal,
                     ),
                     onPressed: () {
-                      if (!estaNoCarrinho) {
-                        carrinho.adicionar(prod);
-                      }
+                      carrinho.adicionar(prod);
                     },
                   );
                 },
@@ -144,14 +152,41 @@ class CarrinhoScreen extends StatelessWidget {
                   itemCount: carrinho.itens.length,
                   itemBuilder: (context, index) {
                     final item = carrinho.itens[index];
+
+                    final quantidade = carrinho.quantidadeDoProduto(item);
+
                     return ListTile(
                       title: Text(item.nome),
                       subtitle: Text('R\$ ${item.preco.toStringAsFixed(2)}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                        onPressed: () {
-                          carrinho.remover(item);
-                        },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              carrinho.diminuir(item);
+                            },
+                          ),
+                          Text(
+                            '$quantidade',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              color: Colors.teal,
+                            ),
+                            onPressed: () {
+                              carrinho.adicionar(item);
+                            },
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -165,13 +200,19 @@ class CarrinhoScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Total: R\$ ${carrinho.valorTotal.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         carrinho.limpar();
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Compra finalizada com sucesso!')),
+                          const SnackBar(
+                            content: Text('Compra finalizada com sucesso!'),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -179,10 +220,10 @@ class CarrinhoScreen extends StatelessWidget {
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('Finalizar'),
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           );
         },
